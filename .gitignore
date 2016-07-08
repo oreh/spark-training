@@ -4,4 +4,3 @@ tmp/
 *.pem
 *.pub
 *.retry
-nodes.json

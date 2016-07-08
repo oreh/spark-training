@@ -1,0 +1,23 @@
+[
+    {
+        "vm_name": "node0",
+        "hostname": "node0",
+        "ip": "192.168.56.100",
+        "box": "spark-training-base",
+        "roles": ["master", "slave"]
+    },
+    {
+        "vm_name": "node1",
+        "hostname": "node0",
+        "ip": "192.168.56.101",
+        "box": "spark-training-base",
+        "roles": ["slave"]
+    },
+    {
+        "vm_name": "node2",
+        "hostname": "node0",
+        "ip": "192.168.56.102",
+        "box": "spark-training-base",
+        "roles": ["slave"]
+    }
+]
