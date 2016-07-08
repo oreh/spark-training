@@ -1,0 +1,8 @@
+[
+    {
+        "vm_name": "base",
+        "hostname": "base",
+        "ip": "192.168.56.10",
+        "provision_script": "playbooks/box_builder/site.yml"
+    }
+]
