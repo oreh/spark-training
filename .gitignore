@@ -1,0 +1,7 @@
+tmp/
+.vagrant
+*.swp
+*.pem
+*.pub
+*.retry
+nodes.json

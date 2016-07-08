@@ -1,0 +1,17 @@
+{
+    "app_name": "dev",
+    "node_roles": [],
+    "gui": false,
+    "box": "ubuntu/trusty64",
+    "username": "vagrant",
+    "password": null,
+    "private_key_path": null,
+    "vm_group": "/Dev",
+    "hostname": null,
+    "network": "private",
+    "forward_ports": [],
+    "mem_size": "2048",
+    "vm_name": "node",
+    "ip": "127.0.0.1",
+    "provision_script": null
+}

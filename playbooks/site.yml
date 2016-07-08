@@ -1,0 +1,105 @@
+- hosts: localhost
+
+  tasks:
+  - shell: python /vagrant/scripts/get_roles.py "{{ansible_hostname}}" master
+    register: master_checker
+
+  - shell: python /vagrant/scripts/get_roles.py "{{ansible_hostname}}" slave
+    register: slave_checker
+
+  - shell: python /vagrant/scripts/get_zk_url.py
+    register: zk_url
+
+  - shell: cp /vagrant/tmp/hosts /etc/hosts
+
+  - shell : cp /vagrant/tmp/ansible_inventory /home/vagrant/ansible_inventory
+
+  - file:
+      path: /home/vagrant/ansible_inventory
+      owner: vagrant
+      group: vagrant
+
+  - lineinfile: dest=/etc/default/docker state=absent regexp="^DOCKER_OPTS.*"
+
+  - name: start docker service
+    service:
+      name: docker
+      state: restarted
+
+  - debug: var={{item}}
+    with_items:
+    - master_checker
+    - slave_cheker
+
+
+  # mesos-master setup 
+  - name: start zookeeper
+    service:
+      name: zookeeper
+      state: running
+    when: master_checker.stdout == 1
+
+  - name: start mesos-master
+    service:
+      name: mesos-master
+      state: running
+    when: master_checker.stdout == 1
+
+
+  # mesos slave setup
+  - name: config zookeeper
+    lineinfile:
+      dest: /etc/mesos/zk
+      create: yes
+      regexp: "^zk:.*$"
+      line: "{{zk_url.stdout}}"
+    when: slave_checker.stdout == "1"
+
+  - name: config containerizers
+    lineinfile:
+      dest: /etc/mesos-slave/containerizers
+      create: yes
+      line: mesos,docker
+    when: slave_checker.stdout == "1"
+
+  - name: config ip
+    lineinfile:
+      dest: /etc/mesos-slave/ip
+      create: yes
+      line: "{{ansible_eth1.ipv4.address}}"
+    when: slave_checker.stdout == "1"
+
+  - name: config hostname
+    lineinfile:
+      dest: /etc/mesos-slave/hostname
+      create: yes
+      line: "{{ansible_eth1.ipv4.address}}"
+    when: slave_checker.stdout == "1"
+
+  - name: config resources
+    lineinfile:
+      dest: /etc/mesos-slave/resources
+      create: yes
+      line: cpus:{{ansible_processor_cores}};mem:{{ansible_memtotal_mb-256}}
+    when: slave_checker.stdout == "1"
+
+  - name: config attributes
+    lineinfile:
+      dest: /etc/mesos-slave/attributes
+      create: yes
+      line: rack:ccm;layer:spot-slave
+    when: slave_checker.stdout == "1"
+
+  - name: config logging
+    lineinfile:
+      dest: /etc/mesos-slave/logging_level
+      create: yes
+      line: WARNING
+    when: slave_checker.stdout == "1"
+
+  - name: start mesos-slave
+    service:
+      name: mesos-slave
+      state: running
+    when: slave_checker.stdout == "1"
+
