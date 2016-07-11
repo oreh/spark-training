@@ -29,7 +29,7 @@
   - debug: var={{item}}
     with_items:
     - master_checker
-    - slave_cheker
+    - slave_checker
 
 
   # mesos-master setup 
@@ -37,13 +37,13 @@
     service:
       name: zookeeper
       state: running
-    when: master_checker.stdout == 1
+    when: master_checker.stdout == "1"
 
   - name: start mesos-master
     service:
       name: mesos-master
       state: running
-    when: master_checker.stdout == 1
+    when: master_checker.stdout == "1"
 
 
   # mesos slave setup
@@ -103,3 +103,25 @@
       state: running
     when: slave_checker.stdout == "1"
 
+  # install spark
+  - name: install spark
+    unarchive:
+      src: /vagrant/packages/spark-1.6.2-bin-2.6.4.tgz
+      dest: /usr/local
+      owner: vagrant
+      group: vagrant
+      creates: /usr/local/spark-1.6.2-bin-2.6.4
+
+  - name: link to spark
+    file:
+      src: /usr/local/spark-1.6.2-bin-2.6.4
+      dest: /usr/local/spark
+      state: link
+
+  - name: set SPARK_HOME
+    blockinfile:
+      dest: /home/vagrant/.bashrc
+      block: |
+        SPARK_HOME=/usr/local/spark
+        PATH=$PATH:${SPARK_HOME}/bin
+      marker: "# {mark} ANSIBLE MANAGED BLOCK spark"

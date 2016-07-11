@@ -3,14 +3,11 @@
   vars:
     ulimit_soft: 65535
     ulimit_hard: 65535
-    docker_engine_version: 1.10.3*
+    docker_engine_version: 1.11*
     mesos_version: 0.28*
     marathon_version: 1.1*
 
   tasks:
-    - name: Ensure bootstrap_dir
-      file: path={{bootstrap_dir}} state=directory mode=0755
-
     - name: Add docker repo key
       apt_key:
         keyserver: hkp://p80.pool.sks-keyservers.net:80
@@ -46,6 +43,7 @@
         cache_valid_time: 3600
       with_items:
         - linux-image-extra-{{ ansible_kernel }}
+        - build-essential
         - vim
         - unzip
         - python-setuptools
@@ -62,6 +60,16 @@
         - libffi-dev
         - libssl-dev
 
+    - name: stop docker service
+      service:
+        name: docker
+        state: stopped
+
+    - name: remove device mapper
+      file:
+        path: /var/lib/docker/devicemapper
+        state: absent
+
     - easy_install: name=pip state=present
 
     - name: install pip packages
@@ -72,9 +80,9 @@
         - boto3
         - virtualenv
         - ipython
-        - awscli
         - supervisor
         - ansible
+        - pandas
 
     - name: Disable services
       service:
@@ -105,3 +113,7 @@
           docker_engine_version: {{docker_engine_version}}
           mesos_version: {{mesos_version}}
           marathon_version: {{marathon_version}}
+
+    - name: white wipe disk
+      shell: bash /vagrant/playbooks/box_builder/files/cleanup.sh
+

@@ -4,7 +4,7 @@
     "gui": false,
     "box": "ubuntu/trusty64",
     "username": "vagrant",
-    "password": null,
+    "password": "vagrant",
     "private_key_path": null,
     "vm_group": "/Dev",
     "hostname": null,
