@@ -12,9 +12,23 @@
 
   - shell: cp /vagrant/tmp/hosts /etc/hosts
 
+  - name: copy our own private key
+    copy:
+      src: spark-training.key
+      dest: /home/vagrant/.ssh/id_rsa
+      owner: vagrant
+      group: vagrant
+      mode: 0600
+
+  - name: config authorized keys
+    lineinfile:
+      dest: /home/vagrant/.ssh/authorized_keys
+      line: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC/c9UoZrCk+/5e9ZA6ocE0gRNz9i5LZOpAxETgV7FsItf/kYD98JO1k+usj6zaiH1toOcV9VN5m/6Ep1AtS8byiAp71btVam7l4I1R01P/omu38OtFAyeKhLWzlBcC4wsGzlgsOnMvmY65hi8w1wR/zsox+TPz+9FDpMTGhj/u3Q== vagrant"
+
   - shell : cp /vagrant/tmp/ansible_inventory /home/vagrant/ansible_inventory
 
-  - file:
+  - name: change owner of /home/vagrant/ansible_inventory
+    file:
       path: /home/vagrant/ansible_inventory
       owner: vagrant
       group: vagrant
@@ -25,11 +39,6 @@
     service:
       name: docker
       state: restarted
-
-  - debug: var={{item}}
-    with_items:
-    - master_checker
-    - slave_checker
 
 
   # mesos-master setup 
@@ -44,6 +53,16 @@
       name: mesos-master
       state: running
     when: master_checker.stdout == "1"
+
+  - name: ensure exists of /etc/ansible
+    file:
+      path: /etc/ansible
+      state: directory
+
+  - name: config ansible
+    copy:
+      src: ansible.cfg
+      dest: /etc/ansible/ansible.cfg
 
 
   # mesos slave setup
