@@ -2,7 +2,7 @@
     "app_name": "dev",
     "node_roles": [],
     "gui": false,
-    "box": "ubuntu/trusty64",
+    "box": "herolxh/spark-training",
     "username": "vagrant",
     "password": "vagrant",
     "private_key_path": null,
