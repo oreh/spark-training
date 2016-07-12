@@ -11,6 +11,7 @@
     "network": "private",
     "forward_ports": [],
     "mem_size": "2048",
+    "cpus": 1,
     "vm_name": "node",
     "ip": "127.0.0.1",
     "provision_script": null

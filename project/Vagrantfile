@@ -111,6 +111,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             config.vm.provider :virtualbox do |vb|
                 vb.gui = node['gui']
                 vb.customize ["modifyvm", :id, "--memory", node['mem_size']]
+                vb.customize ["modifyvm", :id, "--cpus", node['cpus']]
                 vb.customize ["modifyvm", :id, "--groups", node['vm_group']]
                 vb.name = node['app_name'] + "-" + node['vm_name']
             end
